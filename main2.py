@@ -12,6 +12,10 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(687, 472)
+        font = QtGui.QFont()
+        font.setFamily("楷体")
+        font.setPointSize(10)
+        Form.setFont(font)
         self.stackedWidget = QtWidgets.QStackedWidget(Form)
         self.stackedWidget.setGeometry(QtCore.QRect(14, 10, 663, 446))
         self.stackedWidget.setMinimumSize(QtCore.QSize(0, 0))
@@ -405,6 +409,79 @@ class Ui_Form(object):
         self.label.setText("")
         self.label.setObjectName("label")
         self.stackedWidget_2.addWidget(self.page_5)
+        self.page_8 = QtWidgets.QWidget()
+        self.page_8.setObjectName("page_8")
+        self.textEdit = QtWidgets.QTextEdit(self.page_8)
+        self.textEdit.setGeometry(QtCore.QRect(2, 0, 416, 101))
+        font = QtGui.QFont()
+        font.setFamily("微软雅黑")
+        font.setPointSize(10)
+        self.textEdit.setFont(font)
+        self.textEdit.setStyleSheet("QTextEdit {\n"
+"    border: none;\n"
+"    border-radius: 5px;                /*控件边框的弧度，数值越大，则弯曲得越厉害*/\n"
+"    /* padding: 0 8px; */\n"
+" background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,    /*背景*/\n"
+"                                 stop: 0 #ffffff,\n"
+"                                 stop: 1.0 #ffffff);\n"
+"    selection-background-color:#aaaa7f;\n"
+"\n"
+"\n"
+"}")
+        self.textEdit.setObjectName("textEdit")
+        self.pushButton_2 = QtWidgets.QPushButton(self.page_8)
+        self.pushButton_2.setGeometry(QtCore.QRect(424, 5, 93, 37))
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(11)
+        self.pushButton_2.setFont(font)
+        self.pushButton_2.setStyleSheet(" QPushButton {\n"
+"      border:none;\n"
+"      border-radius:5px;\n"
+"    color: rgb(255, 255, 255);\n"
+"      \n"
+"    background-color: rgb(0, 170, 127);\n"
+"  }\n"
+"\n"
+"  QPushButton:pressed {\n"
+"font: 9pt \"黑体\";\n"
+"    background-color: rgb(115, 255, 120);\n"
+"  }\n"
+"\n"
+"  QPushButton:hover {\n"
+"    \n"
+"    background-color: rgb(0, 170, 0);\n"
+"  }\n"
+"\n"
+"")
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_11 = QtWidgets.QPushButton(self.page_8)
+        self.pushButton_11.setGeometry(QtCore.QRect(424, 60, 93, 37))
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(11)
+        self.pushButton_11.setFont(font)
+        self.pushButton_11.setStyleSheet(" QPushButton {\n"
+"      border:none;\n"
+"      border-radius:5px;\n"
+"    color: rgb(255, 255, 255);\n"
+"      \n"
+"    background-color: rgb(0, 170, 127);\n"
+"  }\n"
+"\n"
+"  QPushButton:pressed {\n"
+"font: 9pt \"黑体\";\n"
+"    background-color: rgb(115, 255, 120);\n"
+"  }\n"
+"\n"
+"  QPushButton:hover {\n"
+"    \n"
+"    background-color: rgb(0, 170, 0);\n"
+"  }\n"
+"\n"
+"")
+        self.pushButton_11.setObjectName("pushButton_11")
+        self.stackedWidget_2.addWidget(self.page_8)
         self.gridLayoutWidget = QtWidgets.QWidget(self.page)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 131, 441))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
@@ -543,10 +620,12 @@ class Ui_Form(object):
         self.page_2 = QtWidgets.QWidget()
         self.page_2.setObjectName("page_2")
         self.treeWidget = QtWidgets.QTreeWidget(self.page_2)
-        self.treeWidget.setGeometry(QtCore.QRect(0, 0, 671, 445))
+        self.treeWidget.setGeometry(QtCore.QRect(10, 10, 641, 421))
         self.treeWidget.setStyleSheet("QTreeView {\n"
 "    outline: 0px;\n"
-"    background: rgb(47, 64, 78);\n"
+"border:none;\n"
+"border-radius:5px;\n"
+"    background:#aaaa7f;\n"
 "}\n"
 "QTreeView::item {\n"
 "    min-height: 12px;\n"
@@ -607,7 +686,7 @@ class Ui_Form(object):
         self.retranslateUi(Form)
         self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget_2.setCurrentIndex(0)
-        self.stackedWidget_3.setCurrentIndex(1)
+        self.stackedWidget_3.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
@@ -629,6 +708,8 @@ class Ui_Form(object):
         self.pushButton_8.setText(_translate("Form", "上一题"))
         self.pushButton_9.setText(_translate("Form", "下一题"))
         self.pushButton_10.setText(_translate("Form", "再来一次"))
+        self.pushButton_2.setText(_translate("Form", "上一题"))
+        self.pushButton_11.setText(_translate("Form", "下一题"))
         self.pushButton_more.setText(_translate("Form", "的"))
         self.pushButton_7.setText(_translate("Form", "资助作者"))
         self.pushButton_15.setText(_translate("Form", "个人中心"))
