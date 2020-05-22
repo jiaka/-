@@ -20,7 +20,7 @@ from random import shuffle
 from Childwindows import help
 from login import Ui_Dialog
 import leancloud
-
+import difflib
 
 class Dialog(QDialog, Ui_Dialog):
 
@@ -181,13 +181,14 @@ class Form(QWidget, Ui_Form):
         self.ti = {}
         self.result = {}  # 存放回答结果，用来显示答题报告
         self.result_1 = {}  # 存放回答结果，用来记分和回显
-        self.soc = {'xuan': 2, 'tian': 2}  # 题型的分值
+        self.soc = {'xuan': 2, 'tian': 2, 'jian': 5}  # 题型的分值
         # 题库文件的文件名
         self.file = "tiku.txt"
         self.num = 0
         # 读取题库文件，默认显示选择题
         self.configure()
         self.get_tiku1()
+        self.stackedWidget_3.setCurrentWidget(self.page_6)
         # try:
         #     self.init()
         #     self.UI_tiku()
@@ -275,13 +276,13 @@ class Form(QWidget, Ui_Form):
             flag = -1
             for x in all:
                 if x[0] in ['#', '$', '%', '&']:
-                    if x[0] == '#':
+                    if x[0] == '#':  # 选择
                         flag = 0
-                    elif x[0] == '$':
+                    elif x[0] == '$':  # 填空
                         flag = 1
-                    elif x[0] == '%':
+                    elif x[0] == '%':  # 简答
                         flag = 2
-                    elif x[0] == '&':
+                    elif x[0] == '&':   # 多选
                         flag = 3
                     else:
                         flag = -1
@@ -294,15 +295,27 @@ class Form(QWidget, Ui_Form):
                     else:
                         self.ti[temp].append(x)
                 elif flag == 1:
-                    if x[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    if x[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] and len(x) > 7:
                         self.ti[x] = []
                         self.tixin.append(1)
                         temp = x
                     else:
                         self.ti[temp].append(x)
+                elif flag == 2:
+                    if x[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                        self.ti[x] = [[x], []]
+                        self.tixin.append(2)
+                        temp = x
+                        temp1 = 0
+                    elif x[0] == "答":
+                        temp1 = 1
+                        self.ti[temp][temp1].append(x)
+                    else:
+                        self.ti[temp][temp1].append(x)
                 else:
                     pass
-            # print(self.ti)
+            print(self.ti)
+            print(self.tixin)
         self.len_ti = len(self.ti.keys())
         self.progressBar.setMaximum(self.len_ti)
         self.progressBar.setMinimum(0)
@@ -339,19 +352,23 @@ class Form(QWidget, Ui_Form):
         if self.now_falg == 2 and self.num < self.len_ti:
             y = self.tixin[self.num]
             if y == 0:
+                self.stackedWidget_2.setCurrentWidget(self.page_3)
                 self.stackedWidget_3.setCurrentWidget(self.page_6)
                 self.UI_tiku(self.key[self.num], self.value[self.num])
             elif y == 1:
+                self.stackedWidget_2.setCurrentWidget(self.page_3)
                 self.stackedWidget_3.setCurrentWidget(self.page_7)
                 self.textBrowser.setText(self.key[self.num])
                 self.clearline()
+            elif y == 2:
+                self.stackedWidget_2.setCurrentWidget(self.page_8)
+                self.clearedit()
             else:
                 return -1
         else:
             self.num = 0
             self.stackedWidget_2.setCurrentWidget(self.page_5)
             self.show_result()
-            print(self.result)
         self.progressBar.setValue(self.num)
         self.progressBar.setFormat('{}/{}'.format(self.num, self.len_ti))
 
@@ -430,11 +447,11 @@ class Form(QWidget, Ui_Form):
             if x == y:
                 self.result[self.num] = ['yes', self.key[self.num][:-1]] + [i[:-1] for i in self.value[self.num]] + [
                     "<font color=\"#55ff7f\">{}</font>".format('回答正确'),'\n\n']
-                self.result_1[self.num] = [y, self.soc['xuan']]
+                self.result_1[self.num] = [y, self.soc['xuan'],self.soc['xuan']]
             else:
                 self.result[self.num] = ['no', self.key[self.num][:-1]] + [i[:-1] for i in self.value[self.num]] + [
                     "<font color=\"#FF0000\">{}</font> ".format("回答错误，您错选了 {}".format(y)), '\n\n']
-                self.result_1[self.num] = [y, 0]
+                self.result_1[self.num] = [y, 0,self.soc['xuan']]
 
             self.num += 1
             self.total()
@@ -449,6 +466,19 @@ class Form(QWidget, Ui_Form):
                 self.UI_tiku()
             else:
                 self.textBrowser.append('x')
+
+    def jiandapanduan(self):
+        text = self.textEdit.toPlainText()
+        rat = difflib.SequenceMatcher(None, text, ''.join(self.value[self.num][1])).quick_ratio()
+        if rat > 0.95:
+            rat = 1
+        if self.num in self.result:
+            del self.result[self.num]
+        if self.num in self.result_1:
+            del self.result_1[self.num]
+        self.result[self.num] = ['yes'] + [i[:-1] for i in self.value[self.num][0]] + ["标准答案："] + [i[:-1] for i in self.value[self.num][1]] + [
+                    "<font color=\"#55ff7f\">{}</font>".format('您的答案：'), text, "相似度：{}".format(round(rat, 3)), "\n\n"]
+        self.result_1[self.num] = [text, round(rat,3)*self.soc['jian'], self.soc['jian']]
 
     @pyqtSlot()
     def on_pushButton_A_clicked(self):
@@ -467,17 +497,13 @@ class Form(QWidget, Ui_Form):
         self.xuan_panduan('D')
 
     def show_result(self):
-        print(6)
         self.textBrowser.setText(' ')
         for i in range(self.len_ti):
             if i in self.result:
                 for x in range(1, len(self.result[i])):
                     self.textBrowser.append(self.result[i][x])
-                print(7)
             else:
-                print(8)
                 y = self.tixin[i]
-                print(9)
                 self.textBrowser.append("<font color=\"#FF0000\">{}</font> ".format('此题您没有作答'))
                 if y == 0:
                     self.textBrowser.append(self.key[i][:])
@@ -485,22 +511,30 @@ class Form(QWidget, Ui_Form):
                         self.textBrowser.append(j)
                     self.textBrowser.append('\n')
                 elif y == 1:
-                    print(10)
                     self.textBrowser.append(self.key[i][:])
-                    print(self.result)
-                    print(11)
                     self.textBrowser.append('正确答案为：'+str(self.value[i]))
                     self.textBrowser.append('\n')
-                    print(11)
+
 
         self.textBrowser.append('\n\n')
         sum = 0
-        print(8)
+        sum1 = 0
         for k in self.result_1:
             sum += self.result_1[k][1]
-        self.label.setText('您获得的总分数为{}  \n使用时间'.format(sum))
-        print(9)
+            sum1 += self.result_1[k][2]
+        self.label.setText('总分数为{}分, 您获得的总分数为{}分\n获得的百分制为{}分\n使用时间'.format(sum1,round(sum, 3),round(round(sum, 3)/sum1*100, )))
 
+
+    def clearedit(self):
+        if self.num == self.len_ti - 1:
+            self.pushButton_9.setText('提交')
+        self.textBrowser.setText("")
+        for str in self.value[self.num][0]:
+            self.textBrowser.append(str)
+        if self.num in self.result_1:
+            self.textEdit.setText(self.result_1[self.num][0])
+        else:
+            self.textEdit.clear()
 
     # 清理填写的答案
     def clearline(self):
@@ -560,6 +594,28 @@ class Form(QWidget, Ui_Form):
                 self.num = 0
                 shuffle(self.item_tian)
             self.clearline()
+
+    # 简答上一题
+    @pyqtSlot()
+    def on_pushButton_2_clicked(self):
+        self.jiandapanduan()
+        self.num -= 1
+        if self.num <= 0:
+            self.num = 0
+        if self.pushButton_9.text() == '提交':
+            self.pushButton_9.setText('下一题')
+        self.total()
+
+    # 简答下一题
+    @pyqtSlot()
+    def on_pushButton_11_clicked(self):
+        print(1)
+        self.jiandapanduan()
+        print(2)
+        self.num += 1
+        self.total()
+        print(self.num)
+
 
     # 上一题
     @pyqtSlot()
@@ -746,7 +802,7 @@ class Form(QWidget, Ui_Form):
         if self.num in self.result_1:
             del self.result_1[self.num]
         print(1)
-        self.result_1[self.num] = [answers_1, self.soc['tian'] * (1 - len(answers) / len(answers_a))]
+        self.result_1[self.num] = [answers_1, self.soc['tian'] * (1 - len(answers) / len(answers_a)), self.soc['tian']]
         if answers == []:
             self.result[self.num] = ['yes', self.key[self.num][:]] + [
                 "<font color=\"#55ff7f\">{}</font>".format('回答正确: {}'.format([i for i in self.value[self.num]])), '\n']
